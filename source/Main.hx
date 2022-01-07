@@ -12,6 +12,7 @@ import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
+import lime.system.System;
 
 class Main extends Sprite
 {
@@ -26,6 +27,9 @@ class Main extends Sprite
 	public static var watermarks = true; // Whether to put Kade Engine liteartly anywhere
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
+
+	public static var path:String = System.applicationStorageDirectory;
+
 
 	public static function main():Void
 	{
@@ -87,17 +91,41 @@ class Main extends Sprite
 
 		addChild(game);
 
-		//#if !mobile
+		var ourSource:String = "assets/videos/DO NOT DELETE OR GAME WILL CRASH/dontDelete.webm";
+		
+		#if web
+		var str1:String = "HTML CRAP";
+		var vHandler = new VideoHandler();
+		vHandler.init1();
+		vHandler.video.name = str1;
+		addChild(vHandler.video);
+		vHandler.init2();
+		GlobalVideo.setVid(vHandler);
+		vHandler.source(ourSource);
+		#elseif sys
+		var str1:String = "WEBM SHIT"; 
+		var webmHandle = new WebmHandler();
+		webmHandle.source(ourSource);
+		webmHandle.makePlayer();
+		webmHandle.webm.name = str1;
+		addChild(webmHandle.webm);
+		GlobalVideo.setWebm(webmHandle);
+		#end		
+
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
-		toggleFPS(FlxG.save.data.fps);
 
-		//#end
+		memoryCounter = new MemoryCounter(10, 3, 0xffffff);
+		addChild(memoryCounter);
+
+
 	}
 
 	var game:FlxGame;
 
 	var fpsCounter:FPS;
+	public static var memoryCounter:MemoryCounter;
+
 
 	public function toggleFPS(fpsEnabled:Bool):Void {
 		fpsCounter.visible = fpsEnabled;
@@ -106,6 +134,7 @@ class Main extends Sprite
 	public function changeFPSColor(color:FlxColor)
 	{
 		fpsCounter.textColor = color;
+		memoryCounter.textColor = color;
 	}
 
 	public function setFPSCap(cap:Float)
