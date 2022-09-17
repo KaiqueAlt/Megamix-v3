@@ -89,6 +89,7 @@ class PlayState extends MusicBeatState
 
 	public static var rep:Replay;
 	public static var loadRep:Bool = false;
+	var dance:Bool = false;
 
 	public static var noteBools:Array<Bool> = [false, false, false, false];
 
@@ -448,9 +449,39 @@ class PlayState extends MusicBeatState
 				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
 		}
 
-
 		
-		boyfriend = new Boyfriend(770, 450, SONG.player1);
+		boyfriend = new Boyfriend(770, 450, SelectCharacter.selectedChar);
+		switch (SelectCharacter.selectedChar)
+		{
+
+			case 'spooky':
+				boyfriend.y = 250;
+			case 'pico':	
+				boyfriend.y = 450;
+			case 'dad':
+				boyfriend.y = 150;
+				boyfriend.x = 850;
+			case 'dad':
+				boyfriend.y = 150;
+				boyfriend.x = 850;	
+			case 'mom':
+				boyfriend.y = 150;
+				boyfriend.x = 850;		
+			case 'monster':
+				boyfriend.y = 150;
+				boyfriend.x = 850;	
+			case 'monster-christmas':
+				boyfriend.y = 150;
+				boyfriend.x = 850;	
+			case 'senpai':
+				boyfriend.y = 350;
+				boyfriend.x = 900;	
+				camPos.set(boyfriend.getGraphicMidpoint().x + 300, boyfriend.getGraphicMidpoint().y);	
+			case 'senpai-angry':
+				boyfriend.y = 350;
+				boyfriend.x = 950;	
+				camPos.set(boyfriend.getGraphicMidpoint().x + 300, boyfriend.getGraphicMidpoint().y);																						
+		} 
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
@@ -667,7 +698,7 @@ class PlayState extends MusicBeatState
 			{
 				default:
 				if (FileSystem.exists(Paths.txt("dialogues/" + SONG.song.toLowerCase() + "dialogue"))){
-					schoolIntro(doof);
+					startCountdown();
 				}
 				else{
 					startCountdown();
@@ -821,7 +852,18 @@ class PlayState extends MusicBeatState
 		{
 			dad.dance();
 			gf.dance();
-			boyfriend.playAnim('idle');
+			switch(SelectCharacter.selectedChar){
+				case "spooky":
+				{
+					dance = !dance;
+					if (dance)
+						boyfriend.playAnim('danceRight');
+					else
+						boyfriend.playAnim('danceLeft');
+				}
+				default:
+					boyfriend.playAnim('idle');
+				}
 
 			var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
 			introAssets.set('default', ['ready', "set", "go"]);
@@ -1726,13 +1768,18 @@ class PlayState extends MusicBeatState
 					offsetY = luaModchart.getVar("followYOffset", "float");
 				}
 				#end
-				camFollow.setPosition(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 100 + offsetY);
+
 
 				#if windows
 				if (luaModchart != null)
 					luaModchart.executeState('playerOneTurn', []);
 				#end
-
+				switch(SelectCharacter.selectedChar){
+					case 'senpai' | 'senpai-angry':
+						camFollow.setPosition(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 300 + offsetY);
+					default:
+						camFollow.setPosition(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 100 + offsetY);
+				}
 				switch (curStage)
 				{
 					case 'limo':
@@ -1754,6 +1801,9 @@ class PlayState extends MusicBeatState
 			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
 		}
+		FlxG.watch.addQuick("bf.x", boyfriend.x);
+		FlxG.watch.addQuick("bf.y", boyfriend.y);
+
 
 		FlxG.watch.addQuick("beatShit", curBeat);
 		FlxG.watch.addQuick("stepShit", curStep);
@@ -3056,6 +3106,8 @@ class PlayState extends MusicBeatState
 	var lightningStrikeBeat:Int = 0;
 	var lightningOffset:Int = 8;
 
+
+	
 	override function beatHit()
 	{
 		super.beatHit();
@@ -3123,7 +3175,18 @@ class PlayState extends MusicBeatState
 
 		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
 		{
-			boyfriend.playAnim('idle');
+			switch(SelectCharacter.selectedChar){
+			case "spooky":
+			{
+				dance = !dance;
+				if (dance)
+					boyfriend.playAnim('danceRight');
+				else
+					boyfriend.playAnim('danceLeft');
+			}
+			default:
+				boyfriend.playAnim('idle');
+			}
 		}
 		
 
