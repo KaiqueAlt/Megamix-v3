@@ -22,6 +22,9 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.app.Application;
 import openfl.Assets;
+#if android
+import extension.videoview.VideoView;
+#end
 
 #if windows
 import Discord.DiscordClient;
@@ -311,7 +314,14 @@ class TitleState extends MusicBeatState
 						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
 						OutdatedSubState.needVer = returnedData[0];
 						OutdatedSubState.currChanges = returnedData[1];
-						FlxG.switchState(new OutdatedSubState());
+					#if android
+					VideoView.playVideo('assets/preload/videos/themurderer.mp4');
+					VideoView.onCompletion = function(){
+						if (finishCallback != null){
+							finishCallback();
+						}
+					}
+					#end
 					}
 					else
 					{
