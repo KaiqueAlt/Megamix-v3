@@ -815,7 +815,7 @@ class PlayState extends MusicBeatState
 
 	var luaWiggles:Array<WiggleEffect> = [];
 
-	#if windows
+	#if sys
 	public static var luaModchart:ModchartState = null;
 	#end
 
