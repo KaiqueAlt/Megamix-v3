@@ -95,15 +95,15 @@
 	<haxelib name="polymod"/>
 	<haxelib name="discord_rpc" if="windows"/>
 	<haxelib name="linc_luajit"/>
-	<haxelib name="actuate" />
-	<haxelib name="extension-webm"/>
+
+	<haxelib name="extension-videoview"/>
 
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
 
-	<!--In case you want to use nape with flixel-->
+	<!--In case you want to use nape with flixel-ou->
 	<!--<haxelib name="nape-haxe4" />-->
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
