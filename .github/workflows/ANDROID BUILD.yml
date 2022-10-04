@@ -58,7 +58,6 @@ jobs:
           haxelib git extension-webm https://github.com/KadeDev/extension-webm
           haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
           haxelib git linc_luajit https://github.com/jigsaw-4277821/linc_luajit.git
-          haxelib git extension-videoview https://github.com/jigsaw-4277821/extension-videoview.git
           haxelib list
 
       - name: Create Version Tag
