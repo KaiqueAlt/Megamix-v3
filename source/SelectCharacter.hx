@@ -20,6 +20,9 @@ class SelectCharacter extends MusicBeatState
 	var leftArrow:FlxSprite;
 	public static var selectedChar:String = 'bf';
 	var curChar = 0;
+	var chars:Array<Dynamic> = [
+		['bf'],['dad'],['spooky'],['pico'],['monster'],['mom'],['senpai'],['senpai-angry'],['spirit'],
+	];
 
     override function create(){
 	var ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
@@ -94,8 +97,14 @@ class SelectCharacter extends MusicBeatState
     }
 	function changeSelected(change:Int = 0):Void
 		{
-			curChar += change;
+		curChar += change;
 		
+		if (curChar >= weekData.length)
+			curChar = 0;
+		if (curChar < 0)
+			curChar = weekData.length - 1;
+			
+			
 			var bullShit:Int = 0;
 	
 			for (item in grpCharText.members)
@@ -107,7 +116,7 @@ class SelectCharacter extends MusicBeatState
 					item.alpha = 0.6;
 				bullShit++;
 			}
-			switch(curChar){
+			/*switch(curChar){
 			case 0:
 				selectedChar = 'bf';
 			case 1:
@@ -127,7 +136,8 @@ class SelectCharacter extends MusicBeatState
 			case 8:
 				selectedChar = 'spirit';														
 
-			}
+			}*/
+			selectedChar = chars[curChar];
 		icon.animation.play(selectedChar);
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 		}	
