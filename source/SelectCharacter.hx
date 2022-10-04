@@ -63,6 +63,9 @@ class SelectCharacter extends MusicBeatState
 	add(icon);
 	add(rightArrow);
 	add(leftArrow);
+	 #if mobileC
+	 addVirtualPad(A_B, LEFT_RIGHT);
+	  #end
     super.create();
     }
     override function update(elapsed:Float){
@@ -72,6 +75,8 @@ class SelectCharacter extends MusicBeatState
 			changeSelected(1);
         if (controls.ACCEPT)
             LoadingState.loadAndSwitchState(new PlayState(), true);
+	if (controls.BACK)
+		FlxG.switchState(new StoryMenuState());
 
 		if (controls.RIGHT_P)
 			rightArrow.animation.play('press')
