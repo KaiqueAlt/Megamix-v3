@@ -316,10 +316,9 @@ class TitleState extends MusicBeatState
 						OutdatedSubState.currChanges = returnedData[1];
 					#if android
 					VideoView.playVideo('assets/preload/videos/themurderer.mp4');
-					VideoView.onCompletion = function(){
-						if (finishCallback != null){
-							finishCallback();
-						}
+					VideoView.onCompletion = function()
+					{
+						FlxG.switchState(new MainMenuState());
 					}
 					#end
 					}
