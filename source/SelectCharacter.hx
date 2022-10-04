@@ -99,10 +99,10 @@ class SelectCharacter extends MusicBeatState
 		{
 		curChar += change;
 		
-		if (curChar >= weekData.length)
+		if (curChar >= chars.length)
 			curChar = 0;
 		if (curChar < 0)
-			curChar = weekData.length - 1;
+			curChar = chars.length - 1;
 			
 			
 			var bullShit:Int = 0;
