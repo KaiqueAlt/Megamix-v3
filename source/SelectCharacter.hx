@@ -64,7 +64,7 @@ class SelectCharacter extends MusicBeatState
 	add(rightArrow);
 	add(leftArrow);
 	 #if mobileC
-	 addVirtualPad(A_B, LEFT_RIGHT);
+	 addVirtualPad(LEFT_RIGHT, A_B);
 	  #end
     super.create();
     }
