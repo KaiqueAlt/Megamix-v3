@@ -35,6 +35,11 @@ class Paths
 		return getPreloadPath(file);
 	}
 
+	static public function video(key:String)
+	{
+		return SUtil.getPath() + 'assets/videos/$key.$VIDEO_EXT';
+	}	
+	
 	static public function getLibraryPath(file:String, library = "preload")
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
@@ -127,7 +132,7 @@ class Paths
 
 	inline static public function font(key:String)
 	{
-		return 'assets/fonts/$key';
+		return SUtil.getPath() + 'assets/fonts/$key';
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)
