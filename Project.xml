@@ -43,7 +43,10 @@
 	<classpath name="source" />
 
 	<assets path="assets/shared/images/hitbox"/>
-
+	<android permission="android.permission.ACCESS_NETWORK_STATE"/>
+	<android permission="android.permission.INTERNET"/>
+	<haxelib name="extension-androidtools" if="android"/>
+	
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
