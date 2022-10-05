@@ -37,7 +37,7 @@ class Paths
 
 	static public function video(key:String)
 	{
-		return SUtil.getPath() + 'assets/videos/$key.$VIDEO_EXT';
+		return SUtil.getPath() + 'assets/videos/$key.mp4';
 	}	
 	
 	static public function getLibraryPath(file:String, library = "preload")
