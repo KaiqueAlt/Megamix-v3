@@ -22,9 +22,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.app.Application;
 import openfl.Assets;
-#if android
-import extension.videoview.VideoView;
-#end
+import Random;
 
 #if windows
 import Discord.DiscordClient;
@@ -45,18 +43,20 @@ class TitleState extends MusicBeatState
 	var credTextShit:Alphabet;
 	var textGroup:FlxGroup;
 	var ngSpr:FlxSprite;
+	var curTitle = 0;
 
 	var curWacky:Array<String> = [];
 
 	var wackyImage:FlxSprite;
 
+	
 	override public function create():Void
 	{
+		curTitle = Random.int(0, 1);
 		#if android
 		FlxG.android.preventDefaultKeys = [BACK];
 		#end
 		
-
 		@:privateAccess
 		{
 			trace("Loaded " + openfl.Assets.getLibrary("default").assetsLoaded + " assets (DEFAULT)");
@@ -147,7 +147,14 @@ class TitleState extends MusicBeatState
 			// music.loadStream(Paths.music('freakyMenu'));
 			// FlxG.sound.list.add(music);
 			// music.play();
-			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+			switch(curTitle){
+				case 0:
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+				case 1:	
+					FlxG.sound.playMusic(Paths.music('mods/dusttale'), 0);
+				default:
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+			}
 
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
 		}
@@ -155,46 +162,67 @@ class TitleState extends MusicBeatState
 		Conductor.changeBPM(102);
 		persistentUpdate = true;
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		// bg.antialiasing = true;
-		// bg.setGraphicSize(Std.int(bg.width * 0.6));
-		// bg.updateHitbox();
-		add(bg);
+		switch(curTitle){
+			case 0:
+				var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+				// bg.antialiasing = true;
+				// bg.setGraphicSize(Std.int(bg.width * 0.6));
+				// bg.updateHitbox();
+				add(bg);
+		
+				logoBl = new FlxSprite(-150, -100);
+				logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+				logoBl.antialiasing = true;
+				logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+				logoBl.animation.play('bump');
+				logoBl.updateHitbox();
+				// logoBl.screenCenter();
+				// logoBl.color = FlxColor.BLACK;
+		
+				gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+				gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
+				gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+				gfDance.antialiasing = true;
+				add(gfDance);
+				add(logoBl);
+		
+				titleText = new FlxSprite(100, FlxG.height * 0.8);
+				titleText.frames = Paths.getSparrowAtlas('titleEnter');
+				titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+				titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
+				titleText.antialiasing = true;
+				titleText.animation.play('idle');
+				titleText.updateHitbox();
+				add(titleText);
+		
+				var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
+				logo.screenCenter();
+				logo.antialiasing = true;
+		
 
-		logoBl = new FlxSprite(-150, -100);
-		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
-		logoBl.antialiasing = true;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.animation.play('bump');
-		logoBl.updateHitbox();
-		// logoBl.screenCenter();
-		// logoBl.color = FlxColor.BLACK;
+			case 1:
+				logoBl = new FlxSprite(-400, -300);
+				logoBl.frames = Paths.getSparrowAtlas('titles/dusttale/KadeEngineLogoBumpin');
+				logoBl.antialiasing = true;
+				logoBl.animation.addByPrefix('bump', 'bump', 24);
+				logoBl.updateHitbox();
+				logoBl.setGraphicSize(Std.int(logoBl.width * 0.8));
+				//logoBl.screenCenter();
+				add(logoBl);
 
-		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
-		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		gfDance.antialiasing = true;
-		add(gfDance);
-		add(logoBl);
+				titleText = new FlxSprite(100, FlxG.height * 0.8);
+				titleText.frames = Paths.getSparrowAtlas('titles/dusttale/titleEnter');
+				titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+				titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
+				titleText.antialiasing = true;
+				titleText.animation.play('idle');
+				titleText.updateHitbox();
+				titleText.setPosition(4.65, -3.35);
+				// titleText.screenCenter(X);
+				add(titleText);
 
-		titleText = new FlxSprite(100, FlxG.height * 0.8);
-		titleText.frames = Paths.getSparrowAtlas('titleEnter');
-		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
-		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
-		titleText.antialiasing = true;
-		titleText.animation.play('idle');
-		titleText.updateHitbox();
-		// titleText.screenCenter(X);
-		add(titleText);
-
-		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
-		logo.screenCenter();
-		logo.antialiasing = true;
-		// add(logo);
-
-		// FlxTween.tween(logoBl, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG});
-		// FlxTween.tween(logo, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG, startDelay: 0.1});
+		}
 
 		credGroup = new FlxGroup();
 		add(credGroup);
@@ -206,10 +234,8 @@ class TitleState extends MusicBeatState
 		credTextShit = new Alphabet(0, 0, "ninjamuffin99\nPhantomArcade\nkawaisprite\nevilsk8er", true);
 		credTextShit.screenCenter();
 
-		// credTextShit.alignment = CENTER;
 
 		credTextShit.visible = false;
-
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		add(ngSpr);
 		ngSpr.visible = false;
@@ -217,7 +243,6 @@ class TitleState extends MusicBeatState
 		ngSpr.updateHitbox();
 		ngSpr.screenCenter(X);
 		ngSpr.antialiasing = true;
-
 		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
 		FlxG.mouse.visible = false;
@@ -300,40 +325,8 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-				// Get current version of Kade Engine
-				
-				var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/master/version.downloadMe");
-				var returnedData:Array<String> = [];
-				
-				http.onData = function (data:String)
-				{
-					returnedData[0] = data.substring(0, data.indexOf(';'));
-					returnedData[1] = data.substring(data.indexOf('-'), data.length);
-				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
-					{
-						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
-						OutdatedSubState.needVer = returnedData[0];
-						OutdatedSubState.currChanges = returnedData[1];
-					#if android
-					VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
-					VideoView.onCompletion = function()
-					{
-						FlxG.switchState(new MainMenuState());
-					}
-					#end
-					}
-					else
-					{
-						FlxG.switchState(new MainMenuState());
-					}
-				}
-				
-				http.onError = function (error) {
-				  trace('error: $error');
-				  FlxG.switchState(new MainMenuState()); // fail but we go anyway
-				}
-				
-				http.request();
+
+				  FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
@@ -383,10 +376,15 @@ class TitleState extends MusicBeatState
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
 
-		if (danceLeft)
-			gfDance.animation.play('danceRight');
-		else
-			gfDance.animation.play('danceLeft');
+		switch(curTitle){
+			case 0:
+			if (danceLeft)
+				gfDance.animation.play('danceRight');
+			else
+				gfDance.animation.play('danceLeft');
+			case 1:
+
+		}
 
 		FlxG.log.add(curBeat);
 

@@ -57,6 +57,14 @@ import ui.Mobilecontrols;
 import ModchartState;
 import sys.io.File;
 import openfl.Assets;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxWaveEffect;
+import flixel.addons.effects.chainable.FlxGlitchEffect;
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.util.FlxAxes;
+#if android
+import extension.videoview.VideoView;
+#end
 
 #if windows
 import Discord.DiscordClient;
@@ -92,6 +100,28 @@ class PlayState extends MusicBeatState
 	var dance:Bool = false;
 
 	public static var noteBools:Array<Bool> = [false, false, false, false];
+
+	//dusttale
+	var dustdoof:dialogues.DustDialBox;
+	public static var judgementIlumination:FlxSprite;
+	public static var pressSpace:FlxSprite;
+	public static var miss:FlxSprite;
+	public static var hit:FlxSprite;
+	public static var attack:FlxSprite;
+	public static var coolGlitch:FlxSprite;
+	public static var blackthing:FlxSprite;
+	public static var blasters:FlxSprite;
+	public static var papyrus:FlxSprite;
+	var dustsound:FlxSound;
+	public static var canHit:Bool = false;
+	public static var isAttacking:Bool = false;
+	var dustAccumulated:Int = 0;
+	var healthBarColor1:FlxColor;
+	var iconP1Prefix:String;
+	var iconP2Prefix:String;
+	var kr:FlxSprite;
+	var DustCloud1:FlxSprite;
+	public static var attackedSans:Bool = false;
 
 	var halloweenLevel:Bool = false;
 
@@ -229,6 +259,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		instance = this;
+		attackedSans = false;
 		
 		if (FlxG.save.data.fpsCap > 290)
 			(cast (Lib.current.getChildAt(0), Main)).setFPSCap(800);
@@ -329,12 +360,214 @@ class PlayState extends MusicBeatState
 		//dialogue shit
 		switch (songLowercase)
 		{
-			default:
-				dialogue = CoolUtil.coolTextFile(Paths.txt('dialogues/' + SONG.song.toLowerCase() + "dialogue"));
+			case 'the-murderer':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('the-murderer/dialogue'));
+			case 'red-megalovania':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('red-megalovania/dialogue'));
+			case 'drowning':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('drowning/dialogue'));
+			case 'anthropophobia':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('anthropophobia/dialogue'));
+			case 'd.i.e':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('d.i.e/dialogue'));
+			case 'psychotic-breakdown':
+				dialogue = CoolUtil.coolTextFile(Paths.txt('psychotic-breakdown/dialogue'));
 		}
 
 		switch(SONG.stage)
-		{
+		{			case 'judgementhall':
+			{
+				defaultCamZoom = 0.6;
+				curStage = 'judgementhall';
+				var bg:FlxSprite = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/bg', 'shared'));
+				bg.antialiasing = true;
+				bg.scrollFactor.set(1, 1);
+				bg.active = false;
+				bg.screenCenter(Y);
+
+				judgementIlumination = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/ilumination', 'shared'));
+				judgementIlumination.antialiasing = true;
+				judgementIlumination.scrollFactor.set(1, 1);
+				judgementIlumination.active = false;
+				judgementIlumination.screenCenter(Y);
+
+
+				
+
+				add(bg);
+
+				
+				var glitchEffect = new FlxGlitchEffect(17,16,0.2,FlxGlitchDirection.HORIZONTAL);
+				var glitchSprite = new FlxEffectSprite(bg, [glitchEffect]);
+				coolGlitch = glitchSprite;
+				add(coolGlitch);
+				coolGlitch.x = bg.x;
+				coolGlitch.y = bg.y;
+				coolGlitch.visible = false;
+
+				papyrus = new FlxSprite(1000, 30);
+					papyrus.frames = Paths.getSparrowAtlas('characters/paps');
+					papyrus.animation.addByPrefix('idle', 'Pap idle', 24, true);
+					papyrus.scrollFactor.set(1, 1);
+					papyrus.antialiasing = true;
+					papyrus.setPosition(0, 0);
+					papyrus.alpha = 0;
+					papyrus.animation.play('idle');
+
+					add(papyrus);
+
+
+					
+
+				blackthing = new FlxSprite(-500, -400).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
+		  	    blackthing.scrollFactor.set();
+		   	
+		  	 	blackthing.visible = false;
+		  	 	blackthing.alpha = 1;
+
+		  	 	
+		  	 		pressSpace = new FlxSprite(0, 600).loadGraphic(Paths.image('press', 'shared'));
+					pressSpace.antialiasing = true;
+					pressSpace.scrollFactor.set();
+					pressSpace.active = false;
+					pressSpace.screenCenter(X);
+					pressSpace.screenCenter(Y);
+					pressSpace.visible = false;
+
+					miss = new FlxSprite(0, 0).loadGraphic(Paths.image('miss', 'shared'));
+					miss.antialiasing = true;
+					miss.scrollFactor.set(1, 1);
+					miss.screenCenter(X);
+					miss.screenCenter(Y);
+					miss.updateHitbox();
+					miss.active = false;
+					miss.visible = false;
+
+					hit = new FlxSprite(0, 0).loadGraphic(Paths.image('-20', 'shared'));
+					hit.antialiasing = true;
+					hit.scrollFactor.set(1, 1);
+					hit.screenCenter(X);
+					hit.screenCenter(Y);
+					hit.updateHitbox();
+					hit.active = false;
+					hit.visible = false;
+
+					attack = new FlxSprite(0, 0).loadGraphic(Paths.image('attack', 'shared'));
+					attack.antialiasing = true;
+					attack.scrollFactor.set(1, 1);
+					attack.screenCenter(X);
+					attack.screenCenter(Y);
+					attack.updateHitbox();
+					attack.active = false;
+					attack.visible = false;
+		  	 	
+
+			}
+
+			case 'judgementhall-paps':
+			{
+				defaultCamZoom = 0.6;
+				curStage = 'judgementhall';
+				var bg:FlxSprite = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/paps', 'shared'));
+				bg.antialiasing = true;
+				bg.scrollFactor.set(1, 1);
+				bg.active = false;
+				bg.screenCenter(Y);
+
+				judgementIlumination = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/ilumination', 'shared'));
+				judgementIlumination.antialiasing = true;
+				judgementIlumination.scrollFactor.set(1, 1);
+				judgementIlumination.active = false;
+				judgementIlumination.screenCenter(Y);
+
+
+				
+
+				add(bg);
+
+				
+				var glitchEffect = new FlxGlitchEffect(13,10,0.2,FlxGlitchDirection.HORIZONTAL);
+				var glitchSprite = new FlxEffectSprite(bg, [glitchEffect]);
+				coolGlitch = glitchSprite;
+				add(coolGlitch);
+				coolGlitch.x = bg.x;
+				coolGlitch.y = bg.y;
+				coolGlitch.visible = true;
+
+			}
+
+			case 'judgementhall-chara': //literally the same as paps because we don't have time to do fancy things
+			{
+				defaultCamZoom = 0.6;
+				curStage = 'judgementhall';
+				var bg:FlxSprite = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/chara', 'shared'));
+				bg.antialiasing = true;
+				bg.scrollFactor.set(1, 1);
+				bg.active = false;
+				bg.screenCenter(Y);
+
+				judgementIlumination = new FlxSprite(-267.35, -370.7).loadGraphic(Paths.image('judgementhall/ilumination', 'shared'));
+				judgementIlumination.antialiasing = true;
+				judgementIlumination.scrollFactor.set(1, 1);
+				judgementIlumination.active = false;
+				judgementIlumination.screenCenter(Y);
+
+
+				
+
+				add(bg);
+
+				
+				var glitchEffect = new FlxGlitchEffect(13,10,0.2,FlxGlitchDirection.HORIZONTAL);
+				var glitchSprite = new FlxEffectSprite(bg, [glitchEffect]);
+				coolGlitch = glitchSprite;
+				add(coolGlitch);
+				coolGlitch.x = bg.x;
+				coolGlitch.y = bg.y;
+				coolGlitch.visible = true;
+
+			}
+
+			case 'snowdin_cave':
+			{
+				defaultCamZoom = 0.65;
+				curStage = 'snowdin_cave';
+				var bg:FlxSprite = new FlxSprite(-182.05, -192.85).loadGraphic(Paths.image('snowdin_cave'));
+				bg.antialiasing = true;
+				bg.scrollFactor.set(1, 1);
+				bg.active = false;			
+
+				add(bg);
+			}
+
+			case 'waterfall':
+			{
+				defaultCamZoom = 0.65;
+				curStage = 'waterfall';
+				var bg:FlxSprite = new FlxSprite(-368.9, -439.8).loadGraphic(Paths.image('waterfall/waterfallBG'));
+				bg.antialiasing = true;
+				bg.scrollFactor.set(1, 1);
+				bg.active = false;			
+
+				add(bg);
+
+
+			
+					papyrus = new FlxSprite(1000, 30);
+					papyrus.frames = Paths.getSparrowAtlas('characters/paps');
+					papyrus.animation.addByPrefix('idle', 'Pap idle', 24, true);
+					papyrus.scrollFactor.set(1, 1);
+					papyrus.antialiasing = true;
+					papyrus.setPosition(0, 0);
+					papyrus.alpha = 0;
+					papyrus.animation.play('idle');
+
+					add(papyrus);
+				
+
+
+			}
+
 			case 'stage':
 				{
 						defaultCamZoom = 0.9;
@@ -400,6 +633,8 @@ class PlayState extends MusicBeatState
 				gfVersion = 'gf-christmas';
 			case 'gf-pixel':
 				gfVersion = 'gf-pixel';
+			case 'gf-undyne':
+				gfVersion = 'gf-undyne';
 			default:
 				gfVersion = 'gf';
 		}
@@ -447,6 +682,26 @@ class PlayState extends MusicBeatState
 				dad.x -= 150;
 				dad.y += 100;
 				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
+			//Dusttale
+			case "sans":
+				dad.setPosition(162.4, 76.65);
+				camPos.set(dad.getGraphicMidpoint().x + 200, dad.getGraphicMidpoint().y - 50);
+			case "sansWorried":
+				dad.setPosition(162.4, 76.65);
+				camPos.set(dad.getGraphicMidpoint().x + 200, dad.getGraphicMidpoint().y - 50);
+			case "sansUpset":
+				dad.setPosition(162.4, 76.65);
+				camPos.set(dad.getGraphicMidpoint().x + 200, dad.getGraphicMidpoint().y - 100);
+			case "sansMad":
+				dad.setPosition(162.4, 76.65);
+				camPos.set(dad.getGraphicMidpoint().x + 200, dad.getGraphicMidpoint().y - 50);
+			case "paps":
+				dad.setPosition(-29.3, -86);
+				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
+			case "chara":
+				dad.setPosition(19.4, 142.4);
+				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
+							
 		}
 
 		
@@ -480,13 +735,40 @@ class PlayState extends MusicBeatState
 			case 'senpai-angry':
 				boyfriend.y = 350;
 				boyfriend.x = 950;	
-				camPos.set(boyfriend.getGraphicMidpoint().x + 300, boyfriend.getGraphicMidpoint().y);																						
+				camPos.set(boyfriend.getGraphicMidpoint().x + 300, boyfriend.getGraphicMidpoint().y);
+																														
 		} 
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
 		{
+			case 'judgementhall':
+				boyfriend.setPosition(1080.75, 458.75);
+				gf.setPosition(638.2, 125.6);
+			case 'judgementhall-paps':
+				boyfriend.setPosition(1080.75, 458.75);
+				gf.setPosition(638.2, 125.6);
+			case 'judgementhall-chara':
+				boyfriend.setPosition(1080.75, 458.75);
+				gf.setPosition(6638.2, 6125.6);
+			case 'snowdin_cave':
+				if (boyfriend.curCharacter == 'pico')
+					boyfriend.setPosition(1094.05, 408.75);
+				else
+					boyfriend.setPosition(1094.05, 458.75);
 
+				gf.setPosition(642.2, 125.6);
+			case 'waterfall':
+				boyfriend.setPosition(1094.05, 458.75);
+				switch(gf.curCharacter)
+				{
+					case 'gf':
+					gf.setPosition(642.2, 125.6);
+
+					case 'gf-undyne':
+					gf.setPosition(401.9, 40.05);
+
+				}
 		}
 
 		add(gf);
@@ -514,6 +796,10 @@ class PlayState extends MusicBeatState
 		// doof.y = FlxG.height * 0.5;
 		doof.scrollFactor.set();
 		doof.finishThing = startCountdown;
+
+		dustdoof = new dialogues.DustDialBox(false, dialogue);
+		dustdoof.scrollFactor.set();
+		dustdoof.finishThing = startCountdown;
 
 		Conductor.songPosition = -5000;
 		
@@ -601,8 +887,15 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
+	    DustCloud1 = new FlxSprite(0, 0).loadGraphic(Paths.image('Dust_image'));
+		DustCloud1.scrollFactor.set();
+		DustCloud1.antialiasing = true;
+		DustCloud1.visible = true;
+		DustCloud1.setGraphicSize(Std.int(DustCloud1.width * 1));
+		DustCloud1.alpha = 0;
+
 		// Add Kade Engine watermark
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - KE " + MainMenuState.kadeEngineVer : ""), 16);
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " - ", 16);
 		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		add(kadeEngineWatermark);
@@ -642,6 +935,19 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
+		blasters = new FlxSprite(0,0);
+		blasters.frames = Paths.getSparrowAtlas('gasterBlaster');
+        blasters.animation.addByPrefix('shoot', 'shoot', 24, false);
+        blasters.setGraphicSize(Std.int(blasters.width * 0.7));
+        blasters.setPosition(-600, 75);
+        blasters.visible = false;
+
+        if (FlxG.save.data.downscroll)
+			{
+				blasters.setPosition(-600, -500);
+			}
+	
+
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -650,6 +956,8 @@ class PlayState extends MusicBeatState
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
+		blasters.cameras = [camHUD];	
+		DustCloud1.cameras = [camHUD];
 		if (FlxG.save.data.songPosition)
 		{
 			songPosBG.cameras = [camHUD];
@@ -658,6 +966,10 @@ class PlayState extends MusicBeatState
 		kadeEngineWatermark.cameras = [camHUD];
 		if (loadRep)
 			replayTxt.cameras = [camHUD];
+
+		add(blasters);
+		add(DustCloud1);
+
 
 		#if mobileC
 			mcontrols = new Mobilecontrols();
@@ -696,6 +1008,16 @@ class PlayState extends MusicBeatState
 		{
 			switch (StringTools.replace(curSong," ", "-").toLowerCase())
 			{
+				case 'drowning' | 'd.i.e':
+					dialogueShit(dustdoof);
+				case 'the-murderer':
+					dialogueShit(dustdoof);
+				case 'red-megalovania':
+					dialogueShit(dustdoof);
+				case 'psychotic-breakdown':
+					dialogueShit(dustdoof);
+				case 'anthropophobia':
+					dialogueShit(dustdoof);
 				default:
 				if (FileSystem.exists(Paths.txt("dialogues/" + SONG.song.toLowerCase() + "dialogue"))){
 					startCountdown();
@@ -719,7 +1041,16 @@ class PlayState extends MusicBeatState
 
 		super.create();
 	}
-
+	function dialogueShit(?dialogueBox:dialogues.DustDialBox):Void
+		{
+			if (dialogueBox != null)
+				{
+					inCutscene = true;	
+					add(dialogueBox);
+				}
+				else
+					startCountdown();
+		}
 	function schoolIntro(?dialogueBox:DialogueBox):Void
 	{
 		var black:FlxSprite = new FlxSprite(-100, -100).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
@@ -1490,6 +1821,129 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
+		if (FlxG.keys.justPressed.SPACE && (SONG.song.toLowerCase() == 'anthropophobia'))
+		{
+			attack.visible = false;
+
+			boyfriend.playAnim("slash");
+
+			new FlxTimer().start(1, function(swagTimer:FlxTimer)
+				{
+					isAttacking = false;
+				});
+
+			if (isAttacking == false)
+			{
+				if (canHit == true)
+				{
+					canHit = false;
+					isAttacking = true;
+
+					FlxG.sound.play(Paths.sound('slash_effect'));
+
+					FlxG.camera.shake(0.025, 0.1, null, true, FlxAxes.XY);
+
+					if(isStoryMode)
+					{
+						attackedSans = true;
+					}
+					hit.alpha = 1;
+					health += 4;
+					hit.visible = true;
+
+					new FlxTimer().start(0.5, function(swagTimer:FlxTimer)
+					{
+						new FlxTimer().start(0.01, function(swagTimer:FlxTimer)
+						{
+							hit.alpha -= 0.01;
+
+							if (hit.alpha > 0)
+							{
+								swagTimer.reset();
+							}
+							
+						});
+					});
+
+					
+
+				} 
+				else
+				{
+					miss.alpha = 1;
+					miss.visible = true;
+					isAttacking = true;
+
+					new FlxTimer().start(0.5, function(swagTimer:FlxTimer)
+					{
+
+						new FlxTimer().start(0.01, function(swagTimer:FlxTimer)
+						{
+							miss.alpha -= 0.01;
+
+							if (miss.alpha > 0)
+							{
+								swagTimer.reset();
+							}
+							
+						});
+
+					});
+				} 
+			}
+		}
+
+		//chara drain mechanic in last hope
+
+		if (curSong == 'last-hope' && health > 0.3)
+		{
+			
+			health -= 0.0003;
+
+		}
+
+		switch (dustAccumulated)
+		{
+			case 0:
+			DustCloud1.alpha = 0;
+
+			case 1:
+			DustCloud1.alpha = 0.1;
+
+			case 2:
+			DustCloud1.alpha = 0.2;
+
+			case 3:
+			DustCloud1.alpha = 0.3;
+
+			case 4:
+			DustCloud1.alpha = 0.4;
+
+			case 5:
+			DustCloud1.alpha = 0.5;
+
+			case 6:
+			DustCloud1.alpha = 0.6;
+
+			case 7:
+			DustCloud1.alpha = 0.7;
+
+			case 8:
+			DustCloud1.alpha = 0.8;
+
+			case 9:
+			DustCloud1.alpha = 0.9;
+
+			case 10:
+			DustCloud1.alpha = 1;
+		}
+
+		if (DustCloud1.alpha == 1)
+		{
+			health -= 2;
+		}
+
+
 		super.update(elapsed);
 
 		scoreTxt.text = Ratings.CalculateRanking(songScore,songScoreDef,nps,maxNPS,accuracy);
@@ -2246,8 +2700,31 @@ class PlayState extends MusicBeatState
 
 					PlayState.SONG = Song.loadFromJson(nextSongLowercase + difficulty, PlayState.storyPlaylist[0]);
 					FlxG.sound.music.stop();
-
-					LoadingState.loadAndSwitchState(new PlayState());
+					switch(curSong){
+						#if android
+						case red-megalovania:	
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}
+						case psychotic-breakdown:						
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}
+						case anthropophobia:						
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}						
+						#end
+						default:
+							LoadingState.loadAndSwitchState(new PlayState());
+					}
+					
 				}
 			}
 			else
@@ -2973,6 +3450,314 @@ class PlayState extends MusicBeatState
 
 	var fastCarCanDrive:Bool = true;
 
+	function gasterBlasters():Void
+		{
+			
+			 blasters.visible = true;
+	
+			blasters.animation.play('shoot');
+			FlxG.sound.play(Paths.sound('blaster_shoot'));
+	
+			new FlxTimer().start(0.35 , function(tmr:FlxTimer)
+				{
+					health = 0.1;
+				});
+		}
+	
+		function charaslash():Void
+		{
+			dad.playAnim('slash', false);
+	
+			new FlxTimer().start(0.05, function(tmr:FlxTimer)
+			{
+				FlxG.camera.shake(0.0100, 0.35, null, true, FlxAxes.XY);
+				camHUD.shake(0.0100, 0.35, null, true, FlxAxes.XY);
+				health -= 0.75;
+				FlxG.sound.play(Paths.sound('slash_effect'));
+			});		
+			
+		}
+	
+		function PhantomEffect():Void
+		{
+	
+			FlxG.sound.play(Paths.sound('idk'));
+			new FlxTimer().start(0.01, function(swagTimer:FlxTimer)
+					{
+						
+						if (camHUD.alpha <= 0.05)
+						{
+							trace("done");
+							new FlxTimer().start(10, function(swagTimer:FlxTimer)
+							{
+								new FlxTimer().start(0.01, function(swagTimer:FlxTimer)
+								{
+									camHUD.alpha += 0.01;
+									if (camHUD.alpha != 1)
+									{
+										swagTimer.reset();
+									}
+								});
+							});
+	
+						} else
+						{
+							camHUD.alpha -= 0.01;
+							swagTimer.reset();
+							trace("repeat");
+						}
+						
+					});
+			
+		}
+	
+	
+	
+		function DustCloud():Void
+		{
+			dustAccumulated++;
+	
+			trace(dustAccumulated);
+	
+			new FlxTimer().start(35 , function(tmr:FlxTimer)
+			{
+				dustAccumulated--;
+				trace(dustAccumulated);
+			});
+	
+	
+		
+	
+	
+	
+	
+			dustsound = new FlxSound().loadEmbedded(Paths.sound('dust'));
+			dustsound.play();
+			dustsound.volume = 1;
+			new FlxTimer().start(0.5 , function(tmr:FlxTimer)
+			{
+			dustsound;
+			});
+		}
+	
+		function HealthDrain():Void
+		{
+			kr.visible = true;
+				
+	
+			iconP1Prefix = 'bfKR';
+			remove(iconP1);
+			iconP1 = new HealthIcon('bfKR', false);
+			iconP1.y = healthBar.y - (iconP1.height / 3.5);
+			iconP1.flipX = true;
+			 iconP1.cameras = [camHUD];
+			add(iconP1);
+			healthBar.createFilledBar(0xFF999999, 0xFFf23dc8);
+			boyfriend.playAnim('singUPmiss', true);
+			FlxG.sound.play(Paths.sound("bone"), 1);
+			boyfriend.playAnim('singUPmiss', true);
+			new FlxTimer().start(0.001, function(tmr:FlxTimer)	
+			{
+			boyfriend.playAnim('singUPmiss', true);
+			});
+	
+			var healthDrained:Float = 0;
+	
+			new FlxTimer().start(0.0001, function(swagTimer:FlxTimer)
+				{
+					health -= 0.0008;
+					healthDrained += 0.0008;
+					if (healthDrained < 0.5)
+					{
+						swagTimer.reset();
+					} else
+					{
+						kr.visible = false;
+						healthDrained = 0;
+	
+						if (boyfriend.curCharacter == 'bf-chara')
+						{
+								iconP1Prefix = 'bf-chara';
+								remove(iconP1);
+								iconP1 = new HealthIcon('bf-chara', false);
+								iconP1.y = healthBar.y - (iconP1.height / 3.5);
+								iconP1.flipX = true;
+								 iconP1.cameras = [camHUD];
+								add(iconP1);
+								healthBar.createFilledBar(0xFF999999, 0xFFe81a1a);
+						} else 
+						{
+								iconP1Prefix = 'bf';
+								remove(iconP1);
+								iconP1 = new HealthIcon('bf', false);
+								iconP1.y = healthBar.y - (iconP1.height / 3.5);
+								iconP1.flipX = true;
+								 iconP1.cameras = [camHUD];
+								add(iconP1);
+								healthBar.createFilledBar(0xFF999999, 0xFF51d8fb);
+						}
+	
+					}
+				});
+	
+		}
+	
+		function papyrusAlpha():Void
+		{
+			dad.alpha = 0.8;
+		}
+	
+		function flipAllShits():Void
+		{
+			
+				new FlxTimer().start(0.0001, function(swagTimer:FlxTimer)
+				{
+					FlxTween.tween(FlxG.camera, {angle: -20}, 1, {ease: FlxEase.quadOut});
+					FlxTween.tween(camHUD, {angle: 20}, 1, {ease: FlxEase.quadOut});
+	
+					new FlxTimer().start(1, function(swagTimer:FlxTimer)
+					{
+						FlxTween.tween(FlxG.camera, {angle: 20}, 2, {ease: FlxEase.quadInOut});
+						FlxTween.tween(camHUD, {angle: -20}, 2, {ease: FlxEase.quadInOut});
+	
+							new FlxTimer().start(2, function(swagTimer:FlxTimer)
+							{
+								FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+								FlxTween.tween(camHUD, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+							});
+					});
+	
+					
+	
+	
+				});
+			
+	
+			
+		}
+	
+	
+	
+		function flipCamUp():Void
+		{
+			FlxG.sound.play(Paths.sound('cameraFlip'));
+	
+				//impulse tween
+				FlxTween.tween(FlxG.camera, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+				//FlxTween.tween(camHUD, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+	
+				//animations
+				new FlxTimer().start(0.025, function(tmr:FlxTimer)	
+				{
+					boyfriend.playAnim('hit', false);
+					dad.playAnim('swingUP', false);
+				});
+	
+				//actual rotation tween
+				new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+				{
+					FlxTween.tween(FlxG.camera, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+					//FlxTween.tween(camHUD, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+				});
+	
+				//camera shake
+				new FlxTimer().start(0.30, function(tmr:FlxTimer)	
+				{
+					FlxG.camera.shake(0.025, 0.1, null, true, FlxAxes.XY);
+					boyfriend.playAnim('idle');
+					dad.playAnim('idle');
+				});
+		}
+	
+		function ArrowFunnyUp():Void
+		{
+			FlxG.sound.play(Paths.sound('cameraFlip'));
+	
+				//impulse tween
+				FlxTween.tween(camHUD, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+	
+				//animations
+				new FlxTimer().start(0.025, function(tmr:FlxTimer)	
+				{
+					boyfriend.playAnim('hit', false);
+					dad.playAnim('swingUP', false);
+				});
+	
+				//actual rotation tween
+				new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+				{
+					FlxTween.tween(camHUD, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+				});
+	
+				//camera shake
+				new FlxTimer().start(0.30, function(tmr:FlxTimer)	
+				{
+					FlxG.camera.shake(0.025, 0.1, null, true, FlxAxes.XY);
+					boyfriend.playAnim('idle');
+					dad.playAnim('idle');
+				});
+		}
+	
+		function ArrowFunnyDown():Void
+		{
+			FlxG.sound.play(Paths.sound('cameraFlip'));
+	
+				//impulse tween
+				FlxTween.tween(camHUD, {angle: 210}, 0.15, {ease: FlxEase.quadInOut});
+	
+				//animations
+				new FlxTimer().start(0.025, function(tmr:FlxTimer)	
+				{
+					boyfriend.playAnim('hit', false);
+					dad.playAnim('swingDOWN', false);
+				});
+	
+				//actual rotation tween
+				new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+				{
+					FlxTween.tween(camHUD, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+				});
+	
+				//camera shake
+				new FlxTimer().start(0.30, function(tmr:FlxTimer)	
+				{
+					FlxG.camera.shake(0.025, 0.1, null, true, FlxAxes.XY);
+					boyfriend.playAnim('idle');
+					dad.playAnim('idle');
+				});
+		}
+	
+		function flipCamDown():Void
+		{
+			FlxG.sound.play(Paths.sound('cameraFlip'));
+	
+				//impulse tween
+				FlxTween.tween(FlxG.camera, {angle: 210}, 0.15, {ease: FlxEase.quadInOut});
+				//FlxTween.tween(camHUD, {angle: 210}, 0.15, {ease: FlxEase.quadInOut});
+	
+				//animations
+				new FlxTimer().start(0.025, function(tmr:FlxTimer)	
+				{
+					boyfriend.playAnim('hit', false);
+					dad.playAnim('swingDOWN', false);
+				});
+	
+				//actual rotation tween
+				new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+				{
+					FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					//FlxTween.tween(camHUD, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+				});
+	
+				//camera shake
+				new FlxTimer().start(0.30, function(tmr:FlxTimer)	
+				{
+					FlxG.camera.shake(0.025, 0.1, null, true, FlxAxes.XY);
+					boyfriend.playAnim('idle');
+					dad.playAnim('idle');
+				});
+		}
+
 	function resetFastCar():Void
 	{
 		if(FlxG.save.data.distractions){
@@ -3089,6 +3874,683 @@ class PlayState extends MusicBeatState
 		#end
 
 
+		if (curSong.toLowerCase() == 'anthropophobia')
+			{
+				switch(curStep)
+				{
+					case 1:
+						pressSpace.visible = true;
+					case 90:
+						pressSpace.visible = false;
+					case 114:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 134:
+						canHit = false;
+						attack.visible = false;
+					case 452:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 472:
+						canHit = false;
+						attack.visible = false;
+					case 681:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 701:
+						canHit = false;
+						attack.visible = false;
+					case 1184:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 1204:
+						canHit = false;
+						attack.visible = false;
+					case 1216:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 1236:
+						canHit = false;
+						attack.visible = false;
+					case 1280:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 1300:
+						canHit = false;
+						attack.visible = false;
+					case 2080:
+						canHit = true;
+						attack.visible = true;
+						FlxG.sound.play(Paths.sound('warning'));
+					case 2100:
+						canHit = false;
+						attack.visible = false;
+
+				}
+			}
+			if (curStep == 159 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}	
+		
+				if (curStep == 415 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}	
+		
+				if (curStep == 544 && curSong == 'anthropophobia')
+				{
+					FlxG.camera.shake(0.010, 8.35, null, true, FlxAxes.XY);
+					camHUD.shake(0.010, 8.35, null, true, FlxAxes.XY);
+		
+				}	
+		
+				if (curStep == 672 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}	
+		
+				if (curStep == 672 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				
+		
+				if (curStep == 816 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}		
+		
+				if (curStep == 828 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 840 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}	
+		
+				if (curStep == 859 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 868 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}	
+		
+				if (curStep == 877 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 884 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}	
+		
+				if (curStep == 895 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 928 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 991 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1118 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1118 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1184 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1184 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1216 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1247 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1280 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1472 && curSong == 'anthropophobia')
+				{
+					FlxTween.tween(FlxG.camera, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+		
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyUp();
+		
+				}
+		
+				if (curStep == 1488 && curSong == 'anthropophobia')
+				{
+					FlxTween.tween(FlxG.camera, {angle: 210}, 0.15, {ease: FlxEase.quadInOut});
+		
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyDown();
+		
+				}
+		
+				if (curStep == 1496 && curSong == 'anthropophobia')
+				{
+					FlxTween.tween(FlxG.camera, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyUp();
+		
+				}
+		
+				if (curStep == 1504 && curSong == 'anthropophobia')
+				{
+						FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyDown();
+		
+				}
+		
+				if (curStep == 1519 && curSong == 'anthropophobia')
+				{
+					FlxTween.tween(FlxG.camera, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyUp();
+		
+				}
+		
+				if (curStep == 1517 && curSong == 'anthropophobia')
+				{
+						FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 0}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyDown();
+		
+				}
+		
+				if (curStep == 1532 && curSong == 'anthropophobia')
+				{
+					FlxTween.tween(FlxG.camera, {angle: -30}, 0.15, {ease: FlxEase.quadInOut});
+					new FlxTimer().start(0.15, function(tmr:FlxTimer)	
+					{
+						FlxTween.tween(FlxG.camera, {angle: 180}, 0.15, {ease: FlxEase.quadInOut});
+					});
+					ArrowFunnyUp();
+		
+				}
+		
+				if (curStep == 1532 && curSong == 'anthropophobia')
+				{
+					ArrowFunnyDown();
+					flipCamDown();
+		
+				}	
+				
+		
+				if (curStep == 1526 && curSong == 'anthropophobia')
+				{
+					ArrowFunnyDown();
+		
+				}
+		
+		
+				if (curStep == 1600 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1632 && curSong == 'anthr opophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1657 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1664 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1672 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1678 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1680 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1684 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+
+
+		
+				if (curStep == 1688 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1692 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1696 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1711 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1728 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1744 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1776 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1791 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+				if (curStep == 1824 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1887 && curSong == 'anthropophobia')
+				{
+					flipCamUp();
+		
+				}
+		
+				if (curStep == 1903 && curSong == 'anthropophobia')
+				{
+					gasterBlasters();
+		
+				}	
+		
+				if (curStep == 1951 && curSong == 'anthropophobia')
+				{
+					flipCamDown();
+		
+				}
+		
+		switch (SONG.song.toLowerCase())
+		{
+			case 'the-murderer':
+				switch (curStep)
+				{
+					case 442:
+						flipCamUp();
+						SONG.speed = 2.8;
+					case 635:
+						flipCamDown();
+						SONG.speed = 2.4;
+					case 894:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 4, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(4 , function(tmr:FlxTimer)
+						{
+							defaultCamZoom = 1.2;
+						});
+					case 1085:
+						FlxTween.tween(FlxG.camera, {zoom: 0.65}, 8, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(8 , function(tmr:FlxTimer)
+						{
+							defaultCamZoom = 0.65;
+						});
+					case 1143:
+						flipCamUp();
+						SONG.speed = 2.8;
+					case 1337:
+						flipCamDown();
+						SONG.speed = 2.4;
+				}
+			case 'red-megalovania':
+				switch (curStep)
+				{
+					case 880:
+						papyrus.setPosition(-298.7, -275.95);
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+						{
+							papyrus.alpha += 0.1;
+		
+							if (papyrus.alpha < 0.4)
+							{
+								swagTimer.reset();
+							}
+						});
+					case 1154:
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+						{
+							papyrus.alpha -= 0.1;
+		
+							swagTimer.reset();
+							
+						});
+					case 319,1160,1724,2148:
+						flipCamUp();
+					case 740,1444,2003,2288:
+						flipCamDown();
+				}
+			case 'drowning':
+				switch (curStep) 
+				{
+					case 269,1040:
+						flipCamUp();
+					case 399,1166:
+						flipCamDown();
+					case 252:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 1, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(1 , function(tmr:FlxTimer)
+						{
+							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2, {ease: FlxEase.quadInOut});
+						});
+					case 528:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 15, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(15 , function(tmr:FlxTimer)
+						{
+							defaultCamZoom = 1.2;
+						});
+					case 656:
+						FlxTween.tween(FlxG.camera, {zoom: 0.65}, 15, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(15 , function(tmr:FlxTimer)
+						{
+							defaultCamZoom = 0.65;
+						});
+				}
+			case 'psychotic-breakdown':
+				switch (curStep)
+				{
+					case 512,954,1600:
+						flipCamUp();
+					case 635,1216,1728:
+						flipCamDown();
+				}
+			case 'd.i.e':
+				switch (curStep)
+				{
+					case 11,204,527,652,1165,1216,1224,1284,1282:
+						gasterBlasters();
+					case 272:
+						FlxG.camera.shake(0.010, 16, null, true, FlxAxes.XY);
+						camHUD.shake(0.010, 16, null, true, FlxAxes.XY);
+						coolGlitch.visible = true;
+						new FlxTimer().start(16, function(tmr:FlxTimer)	
+						{
+							coolGlitch.visible = false;
+						});
+					case 1280:
+						gasterBlasters();
+						flipCamUp();
+					case 528,1286,1292:
+						flipCamUp();
+					case 656,1283,1289,1424:
+						flipCamDown();
+				}
+			case 'reality-check':
+				switch (curStep)
+				{
+					case 1232:
+						blackthing.visible = true;
+					case 1248:
+						blackthing.visible = false;
+					case 1648:
+						FlxG.camera.shake(0.025, 7, null, true, FlxAxes.XY);
+						camHUD.shake(0.005, 7, null, true, FlxAxes.XY);
+					case 1768:
+						FlxG.camera.shake(0.03, 5, null, true, FlxAxes.XY);
+						camHUD.shake(0.01, 5, null, true, FlxAxes.XY);
+						blackthing.alpha = 0;
+						blackthing.visible = true;
+			
+			
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+							{	
+								if (blackthing.alpha < 1)
+								{
+									blackthing.alpha += 0.03;
+									swagTimer.reset();
+								}
+								
+							});
+					case 1821:
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+							{	
+								if (blackthing.alpha > 0)
+								{
+									blackthing.alpha -= 0.1;
+									swagTimer.reset();
+								}
+								
+							});
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 0.5, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(2 , function(tmr:FlxTimer)
+						{
+							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 0.5, {ease: FlxEase.quadInOut});
+						});
+					case 1264:
+						remove(dad);
+						dad = new Character(0, 0, 'sans');
+						dad.setPosition(162.4, 76.65);
+						add(dad);
+					case 1815: 
+						coolGlitch.visible = true;
+						remove(dad);
+						dad = new Character(0, 0, 'sansMad');
+						dad.setPosition(162.4, 76.65);
+						add(dad);
+			
+						papyrus.setPosition(-298.7, -275.95);
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+							{
+								papyrus.alpha += 0.1;
+			
+								if (papyrus.alpha < 0.7)
+								{
+									swagTimer.reset();
+								}
+							});
+					case 240,752,1721,2220:
+						flipCamUp();
+					case 503,1247:
+						flipCamUp();
+						gasterBlasters();
+					case 368,1769,2348:
+						flipCamDown();
+					case 880,616:
+						flipCamDown();
+						gasterBlasters();
+					case 423,687,1391,1519,1835:
+						gasterBlasters();
+				}
+			case 'hallucinations':
+				switch (curStep)
+				{
+					case 938:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 1.5, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(1.5 , function(tmr:FlxTimer)
+						{
+							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2, {ease: FlxEase.quadInOut});
+						});
+					case 1231:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 1.5, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(1.5 , function(tmr:FlxTimer)
+						{
+							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2, {ease: FlxEase.quadInOut});
+						});
+					case 1747:
+						FlxTween.tween(FlxG.camera, {zoom: 1.2}, 1.5, {ease: FlxEase.quadInOut});
+						new FlxTimer().start(1.5 , function(tmr:FlxTimer)
+						{
+							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2, {ease: FlxEase.quadInOut});
+						});
+					case 570:
+						flipAllShits();
+						FlxG.camera.shake(0.025, 3.6, null, true, FlxAxes.XY);
+						camHUD.shake(0.005, 3.6, null, true, FlxAxes.XY);
+			
+			
+			
+						new FlxTimer().start(3.6, function(swagTimer:FlxTimer)
+						{
+							if (curStep >= 926)
+							{
+								FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+								FlxTween.tween(camHUD, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+							}
+							
+								else
+							{
+								flipAllShits();
+								FlxG.camera.shake(0.025, 3.6, null, true, FlxAxes.XY);
+								camHUD.shake(0.005, 3.6, null, true, FlxAxes.XY);
+							
+								swagTimer.reset();
+							}
+							
+						});
+					case 1241:
+						flipAllShits();
+						FlxG.camera.shake(0.025, 3.6, null, true, FlxAxes.XY);
+						camHUD.shake(0.005, 3.6, null, true, FlxAxes.XY);
+
+						new FlxTimer().start(3.6, function(swagTimer:FlxTimer)
+							{
+								
+								if (curStep >= 1728)
+								{
+									FlxTween.tween(FlxG.camera, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+									FlxTween.tween(camHUD, {angle: 0}, 1, {ease: FlxEase.quadInOut});
+								}
+								 else
+								{
+									flipAllShits();
+									FlxG.camera.shake(0.025, 3.6, null, true, FlxAxes.XY);
+									camHUD.shake(0.005, 3.6, null, true, FlxAxes.XY);
+									swagTimer.reset();
+								}
+								
+							});
+					case 1800:
+						new FlxTimer().start(0.1, function(swagTimer:FlxTimer)
+						{
+							dad.alpha -= 0.01;
+							iconP2.alpha -= 0.01;
+							swagTimer.reset();
+						});
+				}
+		}
+		//last hope
 
 		// yes this updates every step.
 		// yes this is bad
