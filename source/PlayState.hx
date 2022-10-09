@@ -2702,19 +2702,19 @@ class PlayState extends MusicBeatState
 					FlxG.sound.music.stop();
 					switch(curSong){
 						#if android
-						case red-megalovania:	
+						case "red-megalovania":	
 						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
 						VideoView.onCompletion = function()
 						{
 							LoadingState.loadAndSwitchState(new PlayState(), true);
 						}
-						case psychotic-breakdown:						
+						case "psychotic-breakdown":						
 						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
 						VideoView.onCompletion = function()
 						{
 							LoadingState.loadAndSwitchState(new PlayState(), true);
 						}
-						case anthropophobia:						
+						case "anthropophobia":						
 						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
 						VideoView.onCompletion = function()
 						{
