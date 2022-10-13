@@ -77,7 +77,7 @@ class SelectCharacter extends MusicBeatState
 
         if (controls.ACCEPT){
 		#if android
-		switch(PlayState.SONG.song.toLowerCase){
+		switch(PlayState.SONG.song.toLowerCase()){
 
 			case 'anthropophobia':	
 			VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
