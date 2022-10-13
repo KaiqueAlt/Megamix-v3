@@ -738,6 +738,8 @@ class PlayState extends MusicBeatState
 				boyfriend.y = 350;
 				boyfriend.x = 950;	
 				camPos.set(boyfriend.getGraphicMidpoint().x + 300, boyfriend.getGraphicMidpoint().y);
+			case 'sans':
+				boyfriend.y = 76.5;	
 																														
 		} 
 
@@ -1506,6 +1508,11 @@ class PlayState extends MusicBeatState
 		{
 			// FlxG.log.add(i);
 			var babyArrow:FlxSprite = new FlxSprite(0, strumLine.y);
+
+			if (curSong.toLowerCase() == 'last-hope')
+			{
+				babyArrow.x = 0;
+			}			
 
 			switch (SONG.noteStyle)
 			{
@@ -2638,102 +2645,146 @@ class PlayState extends MusicBeatState
 
 				storyPlaylist.remove(storyPlaylist[0]);
 
-				if (storyPlaylist.length <= 0)
+				switch (SONG.song.toLowerCase())
 				{
-					FlxG.sound.playMusic(Paths.music('freakyMenu'));
-
-					transIn = FlxTransitionableState.defaultTransIn;
-					transOut = FlxTransitionableState.defaultTransOut;
-
-					FlxG.switchState(new StoryMenuState());
-
-					#if windows
-					if (luaModchart != null)
-					{
-						luaModchart.die();
-						luaModchart = null;
-					}
-					#end
-
-					// if ()
-					StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
-
-					if (SONG.validScore)
-					{
-
-						Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
-					}
-
-					FlxG.save.data.weekUnlocked = StoryMenuState.weekUnlocked;
-					FlxG.save.flush();
-				}
-				else
-				{
-					var difficulty:String = "";
-
-					if (storyDifficulty == 0)
-						difficulty = '-easy';
-
-					if (storyDifficulty == 2)
-						difficulty = '-hard';
-
-					trace('LOADING NEXT SONG');
-					// pre lowercasing the next story song name
-					var nextSongLowercase = StringTools.replace(PlayState.storyPlaylist[0], " ", "-").toLowerCase();
-						switch (nextSongLowercase) {
-							case 'dad-battle': nextSongLowercase = 'dadbattle';
-							case 'philly-nice': nextSongLowercase = 'philly';
-						}
-					trace(nextSongLowercase + difficulty);
-
-					// pre lowercasing the song name (endSong)
-					var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
-					switch (songLowercase) {
-						case 'dad-battle': songLowercase = 'dadbattle';
-						case 'philly-nice': songLowercase = 'philly';
-					}
-					if (songLowercase == 'eggnog')
-					{
-						var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
-							-FlxG.height * FlxG.camera.zoom).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-						blackShit.scrollFactor.set();
-						add(blackShit);
-						camHUD.visible = false;
-
-						FlxG.sound.play(Paths.sound('Lights_Shut_off'));
-					}
-
-					FlxTransitionableState.skipNextTransIn = true;
-					FlxTransitionableState.skipNextTransOut = true;
-					prevCamFollow = camFollow;
-
-					PlayState.SONG = Song.loadFromJson(nextSongLowercase + difficulty, PlayState.storyPlaylist[0]);
-					FlxG.sound.music.stop();
-					switch(curSong){
-						#if android
-						case "red-megalovania":	
-						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
-						VideoView.onCompletion = function()
+					case 'anthropophobia':
+						var songFormat = StringTools.replace('last-hope', " ", "-");
+						if (attackedSans)
 						{
-							LoadingState.loadAndSwitchState(new PlayState(), true);
+							songFormat = StringTools.replace('hallucinations', " ", "-");
+							var poop:String = Highscore.formatSong(songFormat, storyDifficulty);
+
+							FlxTransitionableState.skipNextTransIn = true;
+							FlxTransitionableState.skipNextTransOut = true;
+							prevCamFollow = camFollow;
+	
+							FlxG.sound.music.stop();
+							PlayState.SONG = Song.loadFromJson(poop, 'hallucinations');
+							playCutscene2('genocide', 27);
 						}
-						case "psychotic-breakdown":						
-						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
-						VideoView.onCompletion = function()
+						else
 						{
-							LoadingState.loadAndSwitchState(new PlayState(), true);
+							songFormat = StringTools.replace('last-hope', " ", "-");
+							var poop:String = Highscore.formatSong(songFormat, storyDifficulty);
+
+							FlxTransitionableState.skipNextTransIn = true;
+							FlxTransitionableState.skipNextTransOut = true;
+							prevCamFollow = camFollow;
+	
+							FlxG.sound.music.stop();
+							PlayState.SONG = Song.loadFromJson(poop, 'last-hope');
+							playCutscene2('pacifist', 9.2);
 						}
-						case "anthropophobia":						
-						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
-						VideoView.onCompletion = function()
+					case 'last-hope' | 'hallucinations':
+						FlxG.sound.music.stop();
+
+						if (!FlxG.save.data.unlockedRealityCheck)
+							FlxG.save.data.unlockedRealityCheck = true;
+
+						switch (SONG.song.toLowerCase())
 						{
-							LoadingState.loadAndSwitchState(new PlayState(), true);
-						}						
+							case 'last-hope':
+								FlxG.save.data.pacifistEnding = true;
+								LoadingState.loadAndSwitchState(new EndingState());
+							case 'hallucinations':
+								FlxG.save.data.genocideEnding = true;
+								LoadingState.loadAndSwitchState(new EndingState());
+						}
+					default:
+					if (storyPlaylist.length <= 0)
+					{
+						transIn = FlxTransitionableState.defaultTransIn;
+						transOut = FlxTransitionableState.defaultTransOut;
+	
+						paused = true;
+	
+						FlxG.sound.music.stop();
+						vocals.stop();
+						if (FlxG.save.data.scoreScreen)
+							openSubState(new ResultsScreen());
+						else
+						{
+							FlxG.sound.playMusic(Paths.music('freakyMenu'));
+							FlxG.switchState(new MainMenuState());
+						}
+	
+						#if windows
+						if (luaModchart != null)
+						{
+							luaModchart.die();
+							luaModchart = null;
+						}
 						#end
-						default:
-							LoadingState.loadAndSwitchState(new PlayState());
+	
+						// if ()
+						StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
+	
+						if (SONG.validScore)
+						{
+							NGio.unlockMedal(60961);
+							Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
+						}
+	
+						FlxG.save.data.weekUnlocked = StoryMenuState.weekUnlocked;
+						FlxG.save.flush();
 					}
-					
+					else
+					{
+						
+						// adjusting the song name to be compatible
+						var songFormat = StringTools.replace(PlayState.storyPlaylist[0], " ", "-");
+						switch (songFormat) {
+							case 'Dad-Battle': songFormat = 'Dadbattle';
+							case 'Philly-Nice': songFormat = 'Philly';
+						}
+	
+						var poop:String = Highscore.formatSong(songFormat, storyDifficulty);
+	
+						trace('LOADING NEXT SONG');
+						trace(poop);
+	
+						if (StringTools.replace(PlayState.storyPlaylist[0], " ", "-").toLowerCase() == 'eggnog')
+						{
+							var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
+								-FlxG.height * FlxG.camera.zoom).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
+							blackShit.scrollFactor.set();
+							add(blackShit);
+							camHUD.visible = false;
+	
+							FlxG.sound.play(Paths.sound('Lights_Shut_off'));
+						}
+	
+						FlxTransitionableState.skipNextTransIn = true;
+						FlxTransitionableState.skipNextTransOut = true;
+						prevCamFollow = camFollow;
+	
+						FlxG.sound.music.stop();
+	
+						switch(curSong){
+							#if android
+							case "red-megalovania":	
+							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
+							VideoView.onCompletion = function()
+							{
+								LoadingState.loadAndSwitchState(new PlayState(), true);
+							}
+							case "psychotic-breakdown":						
+							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+							VideoView.onCompletion = function()
+							{
+								LoadingState.loadAndSwitchState(new PlayState(), true);
+							}
+							case "anthropophobia":						
+							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+							VideoView.onCompletion = function()
+							{
+								LoadingState.loadAndSwitchState(new PlayState(), true);
+							}						
+							#end
+							default:
+								LoadingState.loadAndSwitchState(new PlayState());
+						}
+					}
 				}
 			}
 			else
@@ -4730,6 +4781,10 @@ class PlayState extends MusicBeatState
 			if(FlxG.save.data.distractions){
 				lightningStrikeShit();
 			}
+		}
+		if (curBeat >= 64 && curBeat % 20 == 0 && curSong.toLowerCase() == 'last-hope' && dad.curCharacter == 'chara')
+		{
+			charaslash();
 		}
 	}
 
