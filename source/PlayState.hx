@@ -65,6 +65,7 @@ import flixel.util.FlxAxes;
 #if android
 import extension.videoview.VideoView;
 #end
+import ui.FlxVirtualPad;
 
 #if windows
 import Discord.DiscordClient;
@@ -79,6 +80,7 @@ using StringTools;
 class PlayState extends MusicBeatState
 {
 	public static var instance:PlayState = null;
+	var _pad:FlxVirtualPad;
 
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -981,6 +983,8 @@ class PlayState extends MusicBeatState
 					controls.setHitBox(mcontrols._hitbox);
 				default:
 			}
+			_pad = new FlxVirtualPad(NONE, A);
+			
 			trackedinputs = controls.trackedinputs;
 			controls.trackedinputs = [];
 
@@ -988,9 +992,14 @@ class PlayState extends MusicBeatState
 			FlxG.cameras.add(camcontrol);
 			camcontrol.bgColor.alpha = 0;
 			mcontrols.cameras = [camcontrol];
+			_pad.cameras = [camcontrol];
 
 			mcontrols.visible = false;
 
+			switch(curSong){
+			case 'anthropophobia':
+				add(_pad);
+			}
 			add(mcontrols);
 		#end
 
@@ -1821,7 +1830,7 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
-		if (FlxG.keys.justPressed.SPACE && (SONG.song.toLowerCase() == 'anthropophobia'))
+		if (FlxG.keys.justPressed.SPACE #if mobileC _pad.buttonA.justPressed #end && (SONG.song.toLowerCase() == 'anthropophobia'))
 		{
 			attack.visible = false;
 
@@ -2700,7 +2709,30 @@ class PlayState extends MusicBeatState
 
 					PlayState.SONG = Song.loadFromJson(nextSongLowercase + difficulty, PlayState.storyPlaylist[0]);
 					FlxG.sound.music.stop();
-					switch(curSong){
+					switch(curSong){					switch(curSong){
+						#if android
+						case "red-megalovania":	
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}
+						case "psychotic-breakdown":						
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}
+						case "anthropophobia":						
+						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+						VideoView.onCompletion = function()
+						{
+							LoadingState.loadAndSwitchState(new PlayState(), true);
+						}						
+						#end
+						default:
+							LoadingState.loadAndSwitchState(new PlayState());
+					}
 						#if android
 						case "red-megalovania":	
 						VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/redmegalovania.mp4');
