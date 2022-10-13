@@ -2683,21 +2683,6 @@ class PlayState extends MusicBeatState
 								LoadingState.loadAndSwitchState(new pacifist(), true);
 							}	
 						}
-					case 'last-hope' | 'hallucinations':
-						FlxG.sound.music.stop();
-
-						if (!FlxG.save.data.unlockedRealityCheck)
-							FlxG.save.data.unlockedRealityCheck = true;
-
-						switch (SONG.song.toLowerCase())
-						{
-							case 'last-hope':
-								FlxG.save.data.pacifistEnding = true;
-								LoadingState.loadAndSwitchState(new EndingState());
-							case 'hallucinations':
-								FlxG.save.data.genocideEnding = true;
-								LoadingState.loadAndSwitchState(new EndingState());
-						}
 					default:
 					if (storyPlaylist.length <= 0)
 					{
@@ -2708,13 +2693,8 @@ class PlayState extends MusicBeatState
 	
 						FlxG.sound.music.stop();
 						vocals.stop();
-						if (FlxG.save.data.scoreScreen)
-							openSubState(new ResultsScreen());
-						else
-						{
-							FlxG.sound.playMusic(Paths.music('freakyMenu'));
-							FlxG.switchState(new MainMenuState());
-						}
+						FlxG.sound.playMusic(Paths.music('freakyMenu'));
+						FlxG.switchState(new MainMenuState());
 	
 						#if windows
 						if (luaModchart != null)
@@ -2729,7 +2709,6 @@ class PlayState extends MusicBeatState
 	
 						if (SONG.validScore)
 						{
-							NGio.unlockMedal(60961);
 							Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 						}
 	
