@@ -83,7 +83,7 @@ class SelectCharacter extends MusicBeatState
 		#if android
 		switch(PlayState.SONG.song.toLowerCase()){
 
-			case 'anthropophobia':	
+			case 'the-murderer':	
 			VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
 			VideoView.onCompletion = function(){
 				LoadingState.loadAndSwitchState(new PlayState(), true);
