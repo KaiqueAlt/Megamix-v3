@@ -67,6 +67,10 @@ class SelectCharacter extends MusicBeatState
 	add(icon);
 	add(rightArrow);
 	add(leftArrow);
+
+	#if mobileC
+	addVirtualPad(FULL, A);
+	#end	
     super.create();
     }
     override function update(elapsed:Float){
@@ -142,11 +146,11 @@ class SelectCharacter extends MusicBeatState
 				selectedChar = 'spirit';														
 			case 9:
 				selectedChar = 'sans';
-			case 9:
-				selectedChar = 'sans';
-			case 9:
+			case 10:
+				selectedChar = 'paps';
+			case 11:
 				selectedChar = 'chara';
-			case 9:
+			case 12:
 				selectedChar = 'bf-chara';												
 			}
 		icon.animation.play(selectedChar);
