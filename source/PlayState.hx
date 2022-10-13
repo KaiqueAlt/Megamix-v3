@@ -2660,7 +2660,11 @@ class PlayState extends MusicBeatState
 	
 							FlxG.sound.music.stop();
 							PlayState.SONG = Song.loadFromJson(poop, 'hallucinations');
-							playCutscene2('genocide', 27);
+							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/genocide.mp4');
+							VideoView.onCompletion = function()
+							{
+								LoadingState.loadAndSwitchState(new PlayState(), true);
+							}	
 						}
 						else
 						{
@@ -2673,7 +2677,11 @@ class PlayState extends MusicBeatState
 	
 							FlxG.sound.music.stop();
 							PlayState.SONG = Song.loadFromJson(poop, 'last-hope');
-							playCutscene2('pacifist', 9.2);
+							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
+							VideoView.onCompletion = function()
+							{
+								LoadingState.loadAndSwitchState(new pacifist(), true);
+							}	
 						}
 					case 'last-hope' | 'hallucinations':
 						FlxG.sound.music.stop();
