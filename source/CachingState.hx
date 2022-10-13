@@ -1,4 +1,4 @@
-package states;
+package;
 #if sys
 import flixel.addons.ui.FlxUIState;
 import flixel.FlxState;
