@@ -239,6 +239,7 @@ class DusttaleStoryMenu extends MusicBeatState
 
 		trace("Line 165");
 
+		addVirtualPad(NONE, A_B);
 		super.create();
 	}
 

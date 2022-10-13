@@ -160,7 +160,20 @@ class DustDialBox extends FlxSpriteGroup
 		portraitLeft.animation.play(currentLeftPortraitAnim);
 		portraitRight.animation.play(currentRightPortraitAnim);
 
-		if (PlayerSettings.player1.controls.ACCEPT && dialogueStarted == true)
+		#if mobile
+		var justTouched:Bool = false;
+
+		for (touch in FlxG.touches.list)
+		{
+			justTouched = false;
+			
+			if (touch.justReleased){
+				justTouched = true;
+			}
+		}
+		#end
+
+		if (PlayerSettings.player1.controls.ACCEPT #if mobile || justTouched #end && dialogueStarted == true)
 		{
 			remove(dialogue);
 				
