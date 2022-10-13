@@ -75,12 +75,13 @@ class SelectCharacter extends MusicBeatState
 		if (controls.RIGHT_P)
 			changeSelected(1);
 
-        if (controls.ACCEPT)
+        if (controls.ACCEPT){
 		#if android
 		switch(PlayState.SONG.song.toLowerCase){
+
+			case 'anthropophobia':	
 			VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
-			VideoView.onCompletion = function()
-			{
+			VideoView.onCompletion = function(){
 				LoadingState.loadAndSwitchState(new PlayState(), true);
 			}
 			default:
@@ -89,6 +90,7 @@ class SelectCharacter extends MusicBeatState
 		#else
 		LoadingState.loadAndSwitchState(new PlayState(), true);
 		#end		
+	}
 
 		if (controls.RIGHT_P)
 			rightArrow.animation.play('press')
