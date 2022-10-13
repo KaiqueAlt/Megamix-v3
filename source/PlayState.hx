@@ -2680,7 +2680,7 @@ class PlayState extends MusicBeatState
 							VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/psychoticbreakdown.mp4');
 							VideoView.onCompletion = function()
 							{
-								LoadingState.loadAndSwitchState(new pacifist(), true);
+								LoadingState.loadAndSwitchState(new PlayState(), true);
 							}	
 						}
 					default:
