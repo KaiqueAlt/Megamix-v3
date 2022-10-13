@@ -9,6 +9,10 @@ import flixel.math.FlxMath;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.ui.FlxButton;
 import Song.SwagSong;
+#if android
+import extension.videoview.VideoView;
+#end
+
 
 class SelectCharacter extends MusicBeatState
 {
@@ -70,8 +74,21 @@ class SelectCharacter extends MusicBeatState
 			changeSelected(-1);
 		if (controls.RIGHT_P)
 			changeSelected(1);
+
         if (controls.ACCEPT)
-            LoadingState.loadAndSwitchState(new PlayState(), true);
+		#if android
+		switch(PlayState.SONG.song.toLowerCase){
+			VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
+			VideoView.onCompletion = function()
+			{
+				LoadingState.loadAndSwitchState(new PlayState(), true);
+			}
+			default:
+				LoadingState.loadAndSwitchState(new PlayState(), true);
+		}
+		#else
+		LoadingState.loadAndSwitchState(new PlayState(), true);
+		#end		
 
 		if (controls.RIGHT_P)
 			rightArrow.animation.play('press')
@@ -121,7 +138,14 @@ class SelectCharacter extends MusicBeatState
 				selectedChar = 'senpai-angry';
 			case 8:
 				selectedChar = 'spirit';														
-
+			case 9:
+				selectedChar = 'sans';
+			case 9:
+				selectedChar = 'sans';
+			case 9:
+				selectedChar = 'chara';
+			case 9:
+				selectedChar = 'bf-chara';												
 			}
 		icon.animation.play(selectedChar);
 		FlxG.sound.play(Paths.sound('scrollMenu'));

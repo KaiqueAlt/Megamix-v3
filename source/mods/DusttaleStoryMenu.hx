@@ -14,10 +14,6 @@ import flixel.tweens.FlxEase;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
-#if android
-import extension.videoview.VideoView;
-#end
-
 #if windows
 import Discord.DiscordClient;
 #end
@@ -394,15 +390,7 @@ class DusttaleStoryMenu extends MusicBeatState
 			PlayState.campaignScore = 0;
 			new FlxTimer().start(1, function(tmr:FlxTimer)
 			{
-                #if android
-                    VideoView.playVideo(SUtil.getPath() + 'assets/assets/videos/themurderer.mp4');
-                    VideoView.onCompletion = function()
-                    {
-                        LoadingState.loadAndSwitchState(new PlayState(), true);
-                    }
-                #else
-				LoadingState.loadAndSwitchState(new PlayState(), true);
-                #end
+				LoadingState.loadAndSwitchState(new SelectCharacter(), true);
 			});
 		}
 	}
