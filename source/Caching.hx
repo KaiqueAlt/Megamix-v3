@@ -169,14 +169,10 @@ class Caching extends MusicBeatState
 
 		trace(Assets.cache.hasBitmapData('GF_assets'));
 
-		if(FlxG.save.data.ps1shit)
-		{
-			FlxG.switchState(new PS1StartUp());
-		}
-		else
-		{
+	
+		
 			FlxG.switchState(new TitleState());
-		}
+		
 	}
 
 }
